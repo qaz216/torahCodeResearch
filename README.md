@@ -1,4 +1,4 @@
-# Original Ripps Paper
+ # Original Ripps Paper
 #
 # Gathered are the exact 'character' sequences detailing the original 5 Books of the Bible "character-by-character"
 
@@ -49,8 +49,6 @@ I was put in touch with someone involved in this research and have obtained the 
 ![image](https://github.com/user-attachments/assets/f64a174f-010a-411f-9afa-db221fd16b82)
 
 ![image](https://github.com/user-attachments/assets/b45d3840-9bbc-4ac3-a7f4-be4d41ba0328)
-
-![image](https://github.com/user-attachments/assets/e7125546-33c8-4c3d-b921-1cb82de9f9c7)
 
 
 
