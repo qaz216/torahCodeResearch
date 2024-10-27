@@ -50,7 +50,7 @@ I was put in touch with someone involved in this research and have obtained the 
 
 ![image](https://github.com/user-attachments/assets/b45d3840-9bbc-4ac3-a7f4-be4d41ba0328)
 
-![image](https://github.com/user-attachments/assets/57f66355-67c8-4db5-82bb-66af5da142c5)
+![image](https://github.com/user-attachments/assets/e7125546-33c8-4c3d-b921-1cb82de9f9c7)
 
 
 
