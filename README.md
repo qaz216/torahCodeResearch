@@ -48,6 +48,9 @@ I was put in touch with someone involved in this research and have obtained the 
 
 ![image](https://github.com/user-attachments/assets/0c476895-9007-4876-86b3-55f400a04b00)
 
+![image](https://github.com/user-attachments/assets/f64a174f-010a-411f-9afa-db221fd16b82)
+
+
 ## Some Wrapper Code
 https://github.com/qaz216/torahCodeResearch/blob/master/src/main/java/com/qaz216/codes/CodeWrapper.java
 
