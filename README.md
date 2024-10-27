@@ -32,3 +32,8 @@ I have personally validated that this data represents the exact character for ch
 
 I was put in touch with someone involved in this research and have obtained the above 5 data sets (Genesis, Exodus, Leviticus, Deuteronomy, Numbers).
 
+![image](https://github.com/user-attachments/assets/0834d1e2-3000-44b7-8b0d-c873479fcda5)
+
+
+
+
