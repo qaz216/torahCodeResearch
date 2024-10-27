@@ -27,3 +27,7 @@ Numbers:
 https://github.com/aryehgolob/torahCodeResearch/blob/master/data/bible/Numbers.txt
 
 I have validated this data against the widely referenced 'Michael Dov Weissmandl' (Weissmandl Sequence) by myself personally.
+
+I have personally validated that this data represents the exact character for character sequence of the 5 books of the Bible to the best of my knowledge.  The oldest known version of this document can be dated back to the "Dead Sea Scrolls" of 2000+ years ago.
+
+
