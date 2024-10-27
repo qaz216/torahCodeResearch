@@ -34,6 +34,12 @@ I was put in touch with someone involved in this research and have obtained the 
 
 ![image](https://github.com/user-attachments/assets/0834d1e2-3000-44b7-8b0d-c873479fcda5)
 
+![image](https://github.com/user-attachments/assets/80f037b1-80b1-4aea-8431-f63b3bc642de)
+
+![image](https://github.com/user-attachments/assets/78ffa92f-869e-4319-9a7e-1b18a86560f4)
+
+
+
 
 
 
