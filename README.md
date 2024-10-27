@@ -50,10 +50,7 @@ I was put in touch with someone involved in this research and have obtained the 
 ![image](https://github.com/user-attachments/assets/b45d3840-9bbc-4ac3-a7f4-be4d41ba0328)
 
 
-
-[![image](https://github.com/user-attachments/assets/45c7fa00-a987-4f66-afb6-722c6f21fd96)
-](https://github.com/qaz216/torahCodeResearch/edit/master/README.md)
-
+![image](https://github.com/user-attachments/assets/a122ccb2-dcd3-4015-bb5b-352fac95c6ec)
 
 ## Some Wrapper Code
 https://github.com/qaz216/torahCodeResearch/blob/master/src/main/java/com/qaz216/codes/CodeWrapper.java
