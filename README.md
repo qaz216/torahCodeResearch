@@ -7,7 +7,7 @@ Ripps paper here:
 
 https://github.com/qaz216/torahCodeResearch/blob/master/ripps.pdf
 
-Paper and Source Data are from 11 year research project which resulted in this papper.  This is the 'Only' peer-reviewed paper on the Torah Codes.  
+Paper and Source Data are the result of 11 year research project which resulted in this papper.  This is the 'Only' peer-reviewed paper on the Torah Codes.  
 
 I have obtained the character-by-character data set used in this experiment.
 
@@ -49,6 +49,9 @@ I was put in touch with someone involved in this research and have obtained the 
 ![image](https://github.com/user-attachments/assets/f64a174f-010a-411f-9afa-db221fd16b82)
 
 ![image](https://github.com/user-attachments/assets/b45d3840-9bbc-4ac3-a7f4-be4d41ba0328)
+
+![image](https://github.com/user-attachments/assets/57f66355-67c8-4db5-82bb-66af5da142c5)
+
 
 
 ![image](https://github.com/user-attachments/assets/0c476895-9007-4876-86b3-55f400a04b00)
