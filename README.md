@@ -54,7 +54,7 @@ I was put in touch with someone involved in this research and have obtained the 
 
 
 
-![image](https://github.com/user-attachments/assets/0c476895-9007-4876-86b3-55f400a04b00)
+![image](https://github.com/user-attachments/assets/45c7fa00-a987-4f66-afb6-722c6f21fd96)
 
 
 
