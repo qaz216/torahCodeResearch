@@ -30,7 +30,7 @@ https://github.com/aryehgolob/torahCodeResearch/blob/master/data/bible/Numbers.t
 
 I have validated this data against the widely referenced 'Michael Dov Weissmandl' (Weissmandl Sequence) by myself.
 
-I have personally validated that this data represents the exact character for character sequence of the 5 books of the Bible to the best of my knowledge.  The oldest known version of this document can be dated back to the "Dead Sea Scrolls" of 2000+ years ago.  Jewish scollorship dates this document at apx: 3,300 years ago at which this document was conveyed to humanity letter-for-letter.
+I have personally validated that this data represents the exact character for character sequence of the 5 books of the Bible to the best of my knowledge.  The oldest known version of this document can be dated back to the "Dead Sea Scrolls" of 2000+ years ago.  Jewish scollorship dates this document at apx: 3,300 years ago at which time this letter-for-letter sequence was given to humanity and preserved through jewish Scholorship.
 
 I was put in touch with someone involved in this research and have obtained the above 5 data sets (Genesis, Exodus, Leviticus, Deuteronomy, Numbers).
 
