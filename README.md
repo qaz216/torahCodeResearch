@@ -1,6 +1,6 @@
  # Original Ripps Paper
 #
-# Gathered are the exact 'character' sequences detailing the original 5 Books of the Bible "character-by-character"
+# Gathered are the exact 'character' sequences detailing the original 5 Books of the Bible Data Set
 
 
 Ripps paper here:
