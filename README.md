@@ -7,7 +7,7 @@ Ripps paper here:
 
 https://github.com/qaz216/torahCodeResearch/blob/master/ripps.pdf
 
-Paper and Source Data are the result of 11 year research project which resulted in this papper.  This is the 'Only' peer-reviewed paper on the Torah Codes ever publishecd.  The Ripps paper is seminal and that is what makes this data set so valuable.  
+Paper and Source Data are the result of 11 year research project by its authors.  It is my understanding that the authors went into their paper as athiest and have emerged as religious Jews.  This is the 'Only' peer-reviewed paper on the Torah Codes ever published on the torah codes.  The Ripps paper is seminal and that is what makes this data set so valuable.  
 
 I have obtained the character-by-character data set used in this experiment.
 
