@@ -53,7 +53,6 @@ I was put in touch with someone involved in this research and have obtained the 
 ![image](https://github.com/user-attachments/assets/b45d3840-9bbc-4ac3-a7f4-be4d41ba0328)
 
 
-![image](https://github.com/user-attachments/assets/a122ccb2-dcd3-4015-bb5b-352fac95c6ec)
 
 ## Some Wrapper Code
 https://github.com/qaz216/torahCodeResearch/blob/master/src/main/java/com/qaz216/codes/CodeWrapper.java
