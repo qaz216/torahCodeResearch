@@ -309,11 +309,11 @@ def _print_proximity(
     print()
     print(
         f"{'rank':>4} {'left':>8} {'right':>8} {'distance':>9} "
-        f"{'span':>7} {'cross':>6} {'overlap':>7}"
+        f"{'span':>7} {'shared':>6} {'relationship':>13}"
     )
     print(
         f"{'-' * 4} {'-' * 8} {'-' * 8} {'-' * 9} "
-        f"{'-' * 7} {'-' * 6} {'-' * 7}"
+        f"{'-' * 7} {'-' * 6} {'-' * 13}"
     )
 
     displayed_pairs = pairs if limit is None else pairs[:limit]
@@ -321,7 +321,7 @@ def _print_proximity(
         print(
             f"{rank:>4} {pair.left.skip:>+8d} {pair.right.skip:>+8d} "
             f"{pair.minimum_letter_distance:>9} {pair.combined_span:>7} "
-            f"{str(pair.intersects):>6} {str(pair.spans_overlap):>7}"
+            f"{pair.shared_letter_count:>6} {pair.relationship:>13}"
         )
         print(
             f"     left-start={pair.left.start_index + 1} "
@@ -390,6 +390,36 @@ def main() -> int:
         help="Keep pairs whose closest selected letters are within this distance",
     )
     proximity_parser.add_argument(
+        "--max-span",
+        type=int,
+        help="Keep pairs whose combined bounding span is at most this size",
+    )
+    proximity_parser.add_argument(
+        "--exclude-shared-letters",
+        action="store_true",
+        help="Exclude pairs that select one or more identical corpus positions",
+    )
+    proximity_parser.add_argument(
+        "--exclude-crossing",
+        action="store_true",
+        help="Exclude crossing spans that do not share a selected letter",
+    )
+    proximity_parser.add_argument(
+        "--disjoint-only",
+        action="store_true",
+        help="Show only pairs whose bounding spans are separate",
+    )
+    proximity_parser.add_argument(
+        "--literal-left",
+        action="store_true",
+        help="Require the left occurrence to be literal forward text (skip +1)",
+    )
+    proximity_parser.add_argument(
+        "--literal-right",
+        action="store_true",
+        help="Require the right occurrence to be literal forward text (skip +1)",
+    )
+    proximity_parser.add_argument(
         "--limit",
         type=int,
         default=20,
@@ -449,6 +479,8 @@ def main() -> int:
                 raise ValueError("--limit must be zero or greater")
             if args.max_distance is not None and args.max_distance < 0:
                 raise ValueError("--max-distance must be zero or greater")
+            if args.max_span is not None and args.max_span < 0:
+                raise ValueError("--max-span must be zero or greater")
             pairs = find_els_pairs(
                 corpus,
                 args.left_word,
@@ -457,6 +489,13 @@ def main() -> int:
                 max_skip,
                 book_code=args.book,
                 max_distance=args.max_distance,
+                max_span=args.max_span,
+                exclude_shared_letters=(
+                    args.exclude_shared_letters or args.disjoint_only
+                ),
+                exclude_crossing=args.exclude_crossing or args.disjoint_only,
+                literal_left=args.literal_left,
+                literal_right=args.literal_right,
             )
             _print_proximity(
                 pairs=pairs,
