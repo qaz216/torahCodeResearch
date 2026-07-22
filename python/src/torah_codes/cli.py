@@ -14,6 +14,7 @@ from torah_codes.els import ELSMatch, find_best_els, find_els, find_els_range
 from torah_codes.els_statistics import ELSStatistics, calculate_els_statistics
 from torah_codes.exceptions import TorahCodesError
 from torah_codes.monte_carlo import MonteCarloResult, run_monte_carlo
+from torah_codes.proximity import ELSPair, find_els_pairs
 
 
 def _add_skip_arguments(parser: argparse.ArgumentParser) -> None:
@@ -289,6 +290,50 @@ def _print_monte_carlo(result: MonteCarloResult, scope: str) -> None:
     )
 
 
+
+def _print_proximity(
+    *,
+    pairs: tuple[ELSPair, ...],
+    left_word: str,
+    right_word: str,
+    scope: str,
+    min_skip: int,
+    max_skip: int,
+    limit: int | None,
+) -> None:
+    print(
+        f"left={left_word} right={right_word} "
+        f"{_format_search_description(min_skip, max_skip)} scope={scope} "
+        f"pairs={len(pairs)}"
+    )
+    print()
+    print(
+        f"{'rank':>4} {'left':>8} {'right':>8} {'distance':>9} "
+        f"{'span':>7} {'cross':>6} {'overlap':>7}"
+    )
+    print(
+        f"{'-' * 4} {'-' * 8} {'-' * 8} {'-' * 9} "
+        f"{'-' * 7} {'-' * 6} {'-' * 7}"
+    )
+
+    displayed_pairs = pairs if limit is None else pairs[:limit]
+    for rank, pair in enumerate(displayed_pairs, start=1):
+        print(
+            f"{rank:>4} {pair.left.skip:>+8d} {pair.right.skip:>+8d} "
+            f"{pair.minimum_letter_distance:>9} {pair.combined_span:>7} "
+            f"{str(pair.intersects):>6} {str(pair.spans_overlap):>7}"
+        )
+        print(
+            f"     left-start={pair.left.start_index + 1} "
+            f"right-start={pair.right.start_index + 1} "
+            f"start-distance={pair.start_distance}"
+        )
+
+    hidden_count = len(pairs) - len(displayed_pairs)
+    if hidden_count > 0:
+        print(f"\n... {hidden_count} additional pairs not shown")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="torah-codes")
     parser.add_argument("--project-root", type=Path, default=Path("."))
@@ -331,6 +376,25 @@ def main() -> int:
     compare_parser.add_argument("right_word")
     _add_skip_arguments(compare_parser)
 
+
+    proximity_parser = subparsers.add_parser(
+        "proximity",
+        help="Analyze proximity between ELS occurrences for two words",
+    )
+    proximity_parser.add_argument("left_word")
+    proximity_parser.add_argument("right_word")
+    _add_skip_arguments(proximity_parser)
+    proximity_parser.add_argument(
+        "--max-distance",
+        type=int,
+        help="Keep pairs whose closest selected letters are within this distance",
+    )
+    proximity_parser.add_argument(
+        "--limit",
+        type=int,
+        default=20,
+        help="Maximum number of pairs to display (default: 20)",
+    )
 
     experiment_parser = subparsers.add_parser(
         "experiment",
@@ -379,6 +443,31 @@ def main() -> int:
         min_skip, max_skip = _resolve_skip_range(args)
         scope = args.book or "TORAH"
 
+
+        if args.command == "proximity":
+            if args.limit is not None and args.limit < 0:
+                raise ValueError("--limit must be zero or greater")
+            if args.max_distance is not None and args.max_distance < 0:
+                raise ValueError("--max-distance must be zero or greater")
+            pairs = find_els_pairs(
+                corpus,
+                args.left_word,
+                args.right_word,
+                min_skip,
+                max_skip,
+                book_code=args.book,
+                max_distance=args.max_distance,
+            )
+            _print_proximity(
+                pairs=pairs,
+                left_word=args.left_word,
+                right_word=args.right_word,
+                scope=scope,
+                min_skip=min_skip,
+                max_skip=max_skip,
+                limit=args.limit,
+            )
+            return 0
 
         if args.command == "experiment":
             if args.iterations <= 0:
