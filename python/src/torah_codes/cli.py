@@ -6,11 +6,38 @@ import argparse
 from collections import Counter
 from pathlib import Path
 
+from torah_codes.comparison import ELSComparison, compare_els_words
 from torah_codes.corpus.loader import load_torah
 from torah_codes.corpus.models import TorahCorpus
 from torah_codes.corpus.validation import summarize_corpus
 from torah_codes.els import ELSMatch, find_best_els, find_els, find_els_range
+from torah_codes.els_statistics import ELSStatistics, calculate_els_statistics
 from torah_codes.exceptions import TorahCodesError
+from torah_codes.monte_carlo import MonteCarloResult, run_monte_carlo
+
+
+def _add_skip_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--skip", type=int, help="Search one signed letter skip")
+    parser.add_argument(
+        "--min-skip",
+        type=int,
+        help="Minimum signed skip for an inclusive range",
+    )
+    parser.add_argument(
+        "--max-skip",
+        type=int,
+        help="Maximum signed skip, or symmetric range when used alone",
+    )
+    parser.add_argument(
+        "--book",
+        choices=("GEN", "EXO", "LEV", "NUM", "DEU"),
+        help="Restrict the search to one book",
+    )
+
+
+def _add_search_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("word", help="Word in canonical transliteration")
+    _add_skip_arguments(parser)
 
 
 def _resolve_skip_range(args: argparse.Namespace) -> tuple[int, int]:
@@ -119,6 +146,149 @@ def _print_matches(
         print(f"\n... {hidden_count} additional matches not shown")
 
 
+def _format_optional_number(value: float | None) -> str:
+    return "n/a" if value is None else f"{value:.2f}"
+
+
+def _print_statistics(
+    *,
+    statistics: ELSStatistics,
+    scope: str,
+) -> None:
+    print(
+        f"word={statistics.word} "
+        f"{_format_search_description(statistics.min_skip, statistics.max_skip)} "
+        f"scope={scope}"
+    )
+    print(f"total matches:       {statistics.total_matches}")
+    print(f"matched skips:       {statistics.matched_skip_count}")
+    print(
+        "mean absolute skip:  "
+        f"{_format_optional_number(statistics.mean_absolute_skip)}"
+    )
+    print(
+        "median absolute skip:"
+        f" {_format_optional_number(statistics.median_absolute_skip)}"
+    )
+
+    if statistics.best_match is None:
+        print("best occurrence:     none")
+    else:
+        print(
+            "best occurrence:     "
+            f"skip={statistics.best_match.skip:+d} "
+            f"start={statistics.best_match.start_index + 1} "
+            f"span={statistics.best_match.span}"
+        )
+
+    peaks = statistics.peak_frequencies
+    if not peaks:
+        print("peak skip:           none")
+    else:
+        peak_description = ", ".join(
+            f"{frequency.skip:+d} ({frequency.matches})"
+            for frequency in peaks
+        )
+        print(f"peak skip:           {peak_description}")
+
+    print("\nskip  matches")
+    print("----  -------")
+    for frequency in statistics.frequencies:
+        print(f"{frequency.skip:+4d}  {frequency.matches:>7}")
+
+
+
+def _format_best_skip(statistics: ELSStatistics) -> str:
+    if statistics.best_match is None:
+        return "n/a"
+    return f"{statistics.best_match.skip:+d}"
+
+
+def _print_comparison(
+    *,
+    comparison: ELSComparison,
+    scope: str,
+) -> None:
+    left = comparison.left
+    right = comparison.right
+
+    print(
+        f"scope={scope} "
+        f"{_format_search_description(left.min_skip, left.max_skip)}"
+    )
+    print()
+    print(f"{'metric':<24} {left.word:>12} {right.word:>12}")
+    print(f"{'-' * 24} {'-' * 12} {'-' * 12}")
+    print(
+        f"{'total matches':<24} "
+        f"{left.total_matches:>12} {right.total_matches:>12}"
+    )
+    print(
+        f"{'matched skips':<24} "
+        f"{left.matched_skip_count:>12} {right.matched_skip_count:>12}"
+    )
+    print(
+        f"{'best skip':<24} "
+        f"{_format_best_skip(left):>12} {_format_best_skip(right):>12}"
+    )
+    print(
+        f"{'mean absolute skip':<24} "
+        f"{_format_optional_number(left.mean_absolute_skip):>12} "
+        f"{_format_optional_number(right.mean_absolute_skip):>12}"
+    )
+    print(
+        f"{'median absolute skip':<24} "
+        f"{_format_optional_number(left.median_absolute_skip):>12} "
+        f"{_format_optional_number(right.median_absolute_skip):>12}"
+    )
+
+    best_difference = comparison.best_absolute_skip_difference
+    print()
+    print(
+        f"match-count ratio:             "
+        f"{_format_optional_number(comparison.match_count_ratio)}"
+    )
+    print(
+        "best absolute-skip difference: "
+        f"{best_difference if best_difference is not None else 'n/a'}"
+    )
+    print(f"shared matched skips:          {len(comparison.shared_matched_skips)}")
+    if comparison.shared_matched_skips:
+        print(
+            "shared skip values:           "
+            + ", ".join(f"{skip:+d}" for skip in comparison.shared_matched_skips)
+        )
+
+
+
+def _format_probability(value: float | None) -> str:
+    return "n/a" if value is None else f"{value:.6f}"
+
+
+def _print_monte_carlo(result: MonteCarloResult, scope: str) -> None:
+    best_skip = result.observed_best_absolute_skip
+    print(
+        f"word={result.word} "
+        f"{_format_search_description(result.min_skip, result.max_skip)} "
+        f"scope={scope}"
+    )
+    print(f"iterations:                  {result.iterations}")
+    print(f"seed:                        {result.seed}")
+    print(f"observed total matches:      {result.observed_total_matches}")
+    print(
+        "observed best absolute skip: "
+        f"{best_skip if best_skip is not None else 'n/a'}"
+    )
+    print(
+        "p(total matches >= observed): "
+        f"{_format_probability(result.total_matches_p_value)}"
+    )
+    print(
+        "p(best skip <= observed):      "
+        f"{_format_probability(result.best_skip_p_value)}"
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="torah-codes")
     parser.add_argument("--project-root", type=Path, default=Path("."))
@@ -130,23 +300,7 @@ def main() -> int:
     )
 
     els_parser = subparsers.add_parser("els", help="Search for an ELS")
-    els_parser.add_argument("word", help="Word in canonical transliteration")
-    els_parser.add_argument("--skip", type=int, help="Search one signed letter skip")
-    els_parser.add_argument(
-        "--min-skip",
-        type=int,
-        help="Minimum signed skip for an inclusive range",
-    )
-    els_parser.add_argument(
-        "--max-skip",
-        type=int,
-        help="Maximum signed skip, or symmetric range when used alone",
-    )
-    els_parser.add_argument(
-        "--book",
-        choices=("GEN", "EXO", "LEV", "NUM", "DEU"),
-        help="Restrict the search to one book",
-    )
+    _add_search_arguments(els_parser)
     els_parser.add_argument(
         "--summary",
         action="store_true",
@@ -163,14 +317,50 @@ def main() -> int:
         help="Maximum number of detailed matches to display",
     )
 
+    stats_parser = subparsers.add_parser(
+        "stats",
+        help="Calculate descriptive statistics for an ELS search",
+    )
+    _add_search_arguments(stats_parser)
+
+    compare_parser = subparsers.add_parser(
+        "compare",
+        help="Compare descriptive ELS statistics for two words",
+    )
+    compare_parser.add_argument("left_word")
+    compare_parser.add_argument("right_word")
+    _add_skip_arguments(compare_parser)
+
+
+    experiment_parser = subparsers.add_parser(
+        "experiment",
+        help="Run reproducible statistical control experiments",
+    )
+    experiment_subparsers = experiment_parser.add_subparsers(
+        dest="experiment_command",
+        required=True,
+    )
+    monte_carlo_parser = experiment_subparsers.add_parser(
+        "monte-carlo",
+        help="Compare a word with weighted random control words",
+    )
+    _add_search_arguments(monte_carlo_parser)
+    monte_carlo_parser.add_argument(
+        "--iterations",
+        type=int,
+        default=1000,
+        help="Number of random control words (default: 1000)",
+    )
+    monte_carlo_parser.add_argument(
+        "--seed",
+        type=int,
+        default=1,
+        help="Random seed for reproducibility (default: 1)",
+    )
+
     args = parser.parse_args()
 
     try:
-        if args.limit is not None and args.limit < 0:
-            raise ValueError("--limit must be zero or greater")
-        if args.summary and args.best:
-            raise ValueError("--summary cannot be combined with --best")
-
         corpus = load_torah(args.project_root)
 
         if args.command == "validate":
@@ -187,6 +377,52 @@ def main() -> int:
             return 0
 
         min_skip, max_skip = _resolve_skip_range(args)
+        scope = args.book or "TORAH"
+
+
+        if args.command == "experiment":
+            if args.iterations <= 0:
+                raise ValueError("--iterations must be greater than zero")
+            result = run_monte_carlo(
+                corpus,
+                args.word,
+                min_skip,
+                max_skip,
+                iterations=args.iterations,
+                seed=args.seed,
+                book_code=args.book,
+            )
+            _print_monte_carlo(result, scope)
+            return 0
+
+        if args.command == "stats":
+            statistics = calculate_els_statistics(
+                corpus,
+                args.word,
+                min_skip,
+                max_skip,
+                book_code=args.book,
+            )
+            _print_statistics(statistics=statistics, scope=scope)
+            return 0
+
+        if args.command == "compare":
+            comparison = compare_els_words(
+                corpus,
+                args.left_word,
+                args.right_word,
+                min_skip,
+                max_skip,
+                book_code=args.book,
+            )
+            _print_comparison(comparison=comparison, scope=scope)
+            return 0
+
+        if args.limit is not None and args.limit < 0:
+            raise ValueError("--limit must be zero or greater")
+        if args.summary and args.best:
+            raise ValueError("--summary cannot be combined with --best")
+
         matches: tuple[ELSMatch, ...]
         if args.best:
             best_match = find_best_els(
@@ -210,7 +446,6 @@ def main() -> int:
     except (TorahCodesError, KeyError, ValueError) as exc:
         parser.exit(1, f"error: {exc}\n")
 
-    scope = args.book or "TORAH"
     book_range = corpus.range_for_book(args.book) if args.book else None
 
     if args.summary:
