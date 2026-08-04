@@ -23,6 +23,8 @@ python -m torah_codes.cli --project-root . validate
 For development:
 
 ```bash
+source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -e '.[dev]'
 pytest
 ```
