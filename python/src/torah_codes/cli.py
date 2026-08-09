@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from pathlib import Path
+import sys
 
 from torah_codes.comparison import ELSComparison, compare_els_words
 from torah_codes.corpus.loader import load_torah
@@ -15,6 +16,14 @@ from torah_codes.els_statistics import ELSStatistics, calculate_els_statistics
 from torah_codes.exceptions import TorahCodesError
 from torah_codes.monte_carlo import MonteCarloResult, run_monte_carlo
 from torah_codes.proximity import ELSPair, find_els_pairs
+from torah_codes.verse_output import find_verse, format_verse, parse_verse_reference
+
+
+def _configure_utf8_output() -> None:
+    """Ensure Unicode output works in Windows consoles and redirections."""
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
 
 
 def _add_skip_arguments(parser: argparse.ArgumentParser) -> None:
@@ -335,6 +344,7 @@ def _print_proximity(
 
 
 def main() -> int:
+    _configure_utf8_output()
     parser = argparse.ArgumentParser(prog="torah-codes")
     parser.add_argument("--project-root", type=Path, default=Path("."))
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -342,6 +352,27 @@ def main() -> int:
     subparsers.add_parser(
         "validate",
         help="Load, validate, and summarize the Torah corpus",
+    )
+
+    verse_parser = subparsers.add_parser(
+        "verse",
+        help="Display one verse in Hebrew or canonical transliteration",
+    )
+    verse_parser.add_argument(
+        "reference",
+        nargs="+",
+        help="Verse reference: 2:23:1, EXO:23:1, or EXO 23:1",
+    )
+    verse_parser.add_argument(
+        "--format",
+        choices=("hebrew", "transliteration"),
+        default="hebrew",
+        help="Output encoding (default: hebrew)",
+    )
+    verse_parser.add_argument(
+        "--letters-only",
+        action="store_true",
+        help="Remove spaces, hyphens, and punctuation",
     )
 
     els_parser = subparsers.add_parser("els", help="Search for an ELS")
@@ -467,6 +498,18 @@ def main() -> int:
             print(
                 f"{'Torah':<12} verses={summary.verses:>4} "
                 f"letters={summary.letters:>6} sha256={summary.sha256}"
+            )
+            return 0
+
+        if args.command == "verse":
+            reference = parse_verse_reference(" ".join(args.reference))
+            verse = find_verse(corpus, reference)
+            print(
+                format_verse(
+                    verse,
+                    output_format=args.format,
+                    letters_only=args.letters_only,
+                )
             )
             return 0
 
