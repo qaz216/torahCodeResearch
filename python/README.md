@@ -30,6 +30,14 @@ verses, so the accepted range is `1` through `5852`.
 python -m torah_codes.cli --project-root .. verse 5423
 ```
 
+The default output identifies both the global verse number and its resolved
+book, chapter, verse, and canonical book code before printing the text:
+
+```text
+Verse 5423 — Deuteronomy 19:16 (DEU)
+כי-יקום עד-חמס באיש לענות בו סרה.
+```
+
 The existing book, chapter, and verse form is also supported. Book numbers
 follow the canonical Torah order: Genesis `1`, Exodus `2`, Leviticus `3`,
 Numbers `4`, and Deuteronomy `5`.
@@ -63,6 +71,15 @@ It can be combined with `--letters-only`:
 ```bash
 python -m torah_codes.cli --project-root .. verse 2:23:1 --format transliteration
 python -m torah_codes.cli --project-root .. verse 2:23:1 --format transliteration --letters-only
+```
+
+Use `--text-only` to omit the reference header when piping or processing the
+verse text. It works with both output formats and with `--letters-only`:
+
+```bash
+python -m torah_codes.cli --project-root .. verse 5786 --text-only
+python -m torah_codes.cli --project-root .. verse 5786 --letters-only --text-only
+python -m torah_codes.cli --project-root .. verse 5786 --format transliteration --text-only
 ```
 
 For development:

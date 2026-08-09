@@ -98,6 +98,22 @@ def find_verse(corpus: TorahCorpus, reference: VerseReference) -> Verse:
     raise ValueError(f"verse not found: {book_name} {reference.chapter}:{reference.verse}")
 
 
+def format_verse_heading(corpus: TorahCorpus, verse: Verse) -> str:
+    """Format a human-readable global and canonical verse reference."""
+
+    try:
+        global_number = corpus.verses.index(verse) + 1
+    except ValueError as exc:
+        raise ValueError("verse does not belong to the loaded Torah corpus") from exc
+
+    reference = verse.reference
+    book_name = BOOK_BY_CODE[reference.book_code].name
+    return (
+        f"Verse {global_number} — {book_name} "
+        f"{reference.chapter}:{reference.verse} ({reference.book_code})"
+    )
+
+
 def format_verse(verse: Verse, *, output_format: str, letters_only: bool) -> str:
     """Format a source verse as Hebrew or canonical transliteration."""
 

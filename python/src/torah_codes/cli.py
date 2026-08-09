@@ -20,6 +20,7 @@ from torah_codes.verse_output import (
     find_verse,
     find_verse_by_number,
     format_verse,
+    format_verse_heading,
     is_global_verse_number,
     parse_verse_reference,
 )
@@ -380,6 +381,11 @@ def main() -> int:
         action="store_true",
         help="Remove spaces, hyphens, and punctuation",
     )
+    verse_parser.add_argument(
+        "--text-only",
+        action="store_true",
+        help="Print only verse text without its global number or reference",
+    )
 
     els_parser = subparsers.add_parser("els", help="Search for an ELS")
     _add_search_arguments(els_parser)
@@ -514,6 +520,8 @@ def main() -> int:
             else:
                 reference = parse_verse_reference(verse_input)
                 verse = find_verse(corpus, reference)
+            if not args.text_only:
+                print(format_verse_heading(corpus, verse))
             print(
                 format_verse(
                     verse,

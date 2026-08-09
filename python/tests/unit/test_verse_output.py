@@ -6,6 +6,7 @@ from torah_codes.corpus.models import TorahCorpus, Verse, VerseReference
 from torah_codes.verse_output import (
     find_verse_by_number,
     format_verse,
+    format_verse_heading,
     is_global_verse_number,
     parse_verse_reference,
 )
@@ -45,6 +46,20 @@ def test_finds_verse_by_one_based_global_number() -> None:
 def test_rejects_global_verse_number_outside_corpus(number: int) -> None:
     with pytest.raises(ValueError, match="between 1 and 3"):
         find_verse_by_number(_corpus_with_three_verses(), number)
+
+
+def test_formats_heading_with_global_and_canonical_reference() -> None:
+    corpus = _corpus_with_three_verses()
+    assert (
+        format_verse_heading(corpus, corpus.verses[1])
+        == "Verse 2 — Genesis 1:2 (GEN)"
+    )
+
+
+def test_rejects_heading_for_verse_outside_corpus() -> None:
+    external_verse = Verse(VerseReference(1, 1, 1, "EXO"), "EXTERNAL", 1)
+    with pytest.raises(ValueError, match="does not belong"):
+        format_verse_heading(_corpus_with_three_verses(), external_verse)
 
 
 @pytest.mark.parametrize(
