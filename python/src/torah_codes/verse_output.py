@@ -45,6 +45,22 @@ _CODE_REFERENCE = re.compile(
     r"^(?P<book>GEN|EXO|LEV|NUM|DEU)(?:\s+|:)(?P<chapter>\d+):(?P<verse>\d+)$",
     re.IGNORECASE,
 )
+_GLOBAL_VERSE_NUMBER = re.compile(r"^[+-]?\d+$")
+
+
+def is_global_verse_number(value: str) -> bool:
+    """Return whether a value has the syntax of a global verse number."""
+
+    return _GLOBAL_VERSE_NUMBER.fullmatch(value.strip()) is not None
+
+
+def find_verse_by_number(corpus: TorahCorpus, number: int) -> Verse:
+    """Return a verse by its one-based position in canonical Torah order."""
+
+    verse_count = len(corpus.verses)
+    if number < 1 or number > verse_count:
+        raise ValueError(f"global verse number must be between 1 and {verse_count}; got {number}")
+    return corpus.verses[number - 1]
 
 
 def parse_verse_reference(value: str) -> VerseReference:
@@ -59,8 +75,8 @@ def parse_verse_reference(value: str) -> VerseReference:
         match = _CODE_REFERENCE.fullmatch(normalized)
         if match is None:
             raise ValueError(
-                "invalid verse reference; use BOOK:CHAPTER:VERSE (2:23:1) "
-                "or CODE CHAPTER:VERSE (EXO 23:1)"
+                "invalid verse reference; use a global verse number (5423), "
+                "BOOK:CHAPTER:VERSE (2:23:1), or CODE CHAPTER:VERSE (EXO 23:1)"
             )
         book_code = match.group("book").upper()
         book_index = BOOK_INDEX_BY_CODE[book_code]

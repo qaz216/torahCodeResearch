@@ -22,9 +22,17 @@ python -m torah_codes.cli --project-root . validate
 
 ## Display a verse in Hebrew
 
-Use the `verse` command with a numeric book reference. Book numbers follow the
-canonical Torah order: Genesis `1`, Exodus `2`, Leviticus `3`, Numbers `4`, and
-Deuteronomy `5`.
+Use the `verse` command with a global, one-based verse number to select a verse
+from the full Torah in canonical order. The validated corpus contains 5,852
+verses, so the accepted range is `1` through `5852`.
+
+```bash
+python -m torah_codes.cli --project-root .. verse 5423
+```
+
+The existing book, chapter, and verse form is also supported. Book numbers
+follow the canonical Torah order: Genesis `1`, Exodus `2`, Leviticus `3`,
+Numbers `4`, and Deuteronomy `5`.
 
 ```bash
 python -m torah_codes.cli --project-root .. verse 2:23:1

@@ -16,7 +16,13 @@ from torah_codes.els_statistics import ELSStatistics, calculate_els_statistics
 from torah_codes.exceptions import TorahCodesError
 from torah_codes.monte_carlo import MonteCarloResult, run_monte_carlo
 from torah_codes.proximity import ELSPair, find_els_pairs
-from torah_codes.verse_output import find_verse, format_verse, parse_verse_reference
+from torah_codes.verse_output import (
+    find_verse,
+    find_verse_by_number,
+    format_verse,
+    is_global_verse_number,
+    parse_verse_reference,
+)
 
 
 def _configure_utf8_output() -> None:
@@ -361,7 +367,7 @@ def main() -> int:
     verse_parser.add_argument(
         "reference",
         nargs="+",
-        help="Verse reference: 2:23:1, EXO:23:1, or EXO 23:1",
+        help="Global verse number or reference: 5423, 2:23:1, EXO:23:1, or EXO 23:1",
     )
     verse_parser.add_argument(
         "--format",
@@ -502,8 +508,12 @@ def main() -> int:
             return 0
 
         if args.command == "verse":
-            reference = parse_verse_reference(" ".join(args.reference))
-            verse = find_verse(corpus, reference)
+            verse_input = " ".join(args.reference)
+            if is_global_verse_number(verse_input):
+                verse = find_verse_by_number(corpus, int(verse_input))
+            else:
+                reference = parse_verse_reference(verse_input)
+                verse = find_verse(corpus, reference)
             print(
                 format_verse(
                     verse,
